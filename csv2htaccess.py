@@ -7,7 +7,9 @@ import urllib.parse
 
 def main(args):
 
-	lines = getCsvLines(args.inputfile)
+	encoding = 'utf8' # TODO: Option
+
+	lines = getCsvLines(args.inputfile, encoding)
 
 	for l in lines:
 
@@ -24,10 +26,10 @@ def main(args):
 
 
 
-def getCsvLines(filename):
+def getCsvLines(filename, encoding):
 
 	try:
-		with open(filename, mode='r', encoding='utf-8') as lines:
+		with open(filename, mode='r', encoding=encoding) as lines:
 			for line in lines:
 				yield line
 
