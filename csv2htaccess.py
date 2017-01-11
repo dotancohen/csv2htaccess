@@ -11,9 +11,13 @@ def main(args):
 
 	lines = getCsvLines(args.inputfile, encoding)
 
-	outfile = getOutputFile(args.outputfile, args.inputfile, encoding)
+	outfile = False
 
 	for l in lines:
+
+		if not outfile:
+			# Run the iterator before creating the output file
+			outfile = getOutputFile(args.outputfile, args.inputfile, encoding)
 
 		l = urllib.parse.unquote(l).strip()
 		parts = l.split(",")
@@ -40,8 +44,6 @@ def getCsvLines(filename, encoding):
 	except FileNotFoundError:
 		print('Input file "' + filename + '" not found.')
 		sys.exit(-1)
-
-	return False
 
 
 
