@@ -1,20 +1,15 @@
 #!/usr/bin/env python3
 
+import argparse
+import sys
 import urllib.parse
 
-lines = """
-http://www.example.com/foo/bar.php,https://foobar.net/product/laptop
-http://www.example.com/foo/baz.php,https://foobar.net/product/desktop
-http://www.example.com/foo/bom.php,https://foobar.net/product/tablet
-http://www.example.com/?ArticleID=42,https://foobar.net/article/We-are-the-best
-http://www.example.com/?CategoryID=2&ArticleID=100,https://foobar.net/article/We-sell-for-less
-http://www.example.com/?CategoryID=4&ArticleID=101,https://foobar.net/article/We-have-higher-quality
-http://www.example.com/foo/bar.php?Cat=20&Dog=50,https://foobar.net/product/mobile
-"""
 
-def main(lines):
+def main(args):
 
-	for l in lines.split("\n"):
+	lines = getCsvLines(args.inputfile)
+
+	for l in lines:
 
 		l = urllib.parse.unquote(l).strip()
 		parts = l.split(",")
@@ -26,6 +21,21 @@ def main(lines):
 		print(outline)
 
 	return True
+
+
+
+def getCsvLines(filename):
+
+	try:
+		with open(filename, mode='r', encoding='utf-8') as lines:
+			for line in lines:
+				yield line
+
+	except FileNotFoundError:
+		print('Input file "' + filename + '" not found.')
+		sys.exit(-1)
+
+	return False
 
 
 
@@ -86,4 +96,9 @@ def parsePath(old, new):
 
 
 if __name__=="__main__":
-	main(lines)
+	parser = argparse.ArgumentParser()
+
+	parser.add_argument('inputfile', help='CSV file used as import data')
+
+	args = parser.parse_args()
+	main(args)
