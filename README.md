@@ -40,3 +40,4 @@ Into this:
 	RewriteCond %{QUERY_STRING} Cat=20
 	RewriteCond %{QUERY_STRING} Dog=50
 	RewriteRule ^(.*)$ https://foobar.net/product/mobile [R=302,L,NC]
+
