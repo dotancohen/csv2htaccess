@@ -1,0 +1,7 @@
+http://www.example.com/foo/bar.php,https://foobar.net/product/laptop
+http://www.example.com/foo/baz.php,https://foobar.net/product/desktop
+http://www.example.com/foo/bom.php,https://foobar.net/product/tablet
+http://www.example.com/?ArticleID=42,https://foobar.net/article/We-are-the-best
+http://www.example.com/?CategoryID=2&ArticleID=100,https://foobar.net/article/We-sell-for-less
+http://www.example.com/?CategoryID=4&ArticleID=101,https://foobar.net/article/We-have-higher-quality
+http://www.example.com/foo/bar.php?Cat=20&Dog=50,https://foobar.net/product/mobile
