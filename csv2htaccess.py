@@ -9,6 +9,7 @@ http://www.example.com/foo/bom.php,https://foobar.net/product/tablet
 http://www.example.com/?ArticleID=42,https://foobar.net/article/We-are-the-best
 http://www.example.com/?CategoryID=2&ArticleID=100,https://foobar.net/article/We-sell-for-less
 http://www.example.com/?CategoryID=4&ArticleID=101,https://foobar.net/article/We-have-higher-quality
+http://www.example.com/foo/bar.php?Cat=20&Dog=50,https://foobar.net/product/mobile
 """
 
 def main(lines):
@@ -34,10 +35,19 @@ def parseCsvLine(old, new):
 	path = old_parts.path
 	qs = urllib.parse.parse_qsl(old_parts.query)
 
-	if len(qs)==0:
-		return parsePath(old, new)
+	if parseCsvLine.previousQS:
+		prevNewLine = "\n"
+	else:
+		prevNewLine = ""
 
+	if len(qs)==0:
+		parseCsvLine.previousQS = False
+		return prevNewLine + parsePath(old, new)
+
+	parseCsvLine.previousQS = True
 	return parseQueryString(path, qs, new)
+
+parseCsvLine.previousQS = False
 
 
 
