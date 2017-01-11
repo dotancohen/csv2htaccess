@@ -11,6 +11,8 @@ def main(args):
 
 	lines = getCsvLines(args.inputfile, encoding)
 
+	outfile = getOutputFile(args.outputfile, args.inputfile, encoding)
+
 	for l in lines:
 
 		l = urllib.parse.unquote(l).strip()
@@ -20,8 +22,10 @@ def main(args):
 			continue
 
 		outline = parseCsvLine(parts[0].strip(), parts[1].strip())
-		print(outline)
+		outfile.write(outline + "\n")
 
+
+	outfile.close()
 	return True
 
 
@@ -38,6 +42,20 @@ def getCsvLines(filename, encoding):
 		sys.exit(-1)
 
 	return False
+
+
+
+def getOutputFile(filename, filename_in, encoding):
+
+	if filename=='':
+		filename_out = filename_in + '.htaccess'
+
+	else:
+		filename_out = filename
+
+	outfile = open(filename_out, mode='w', encoding=encoding)
+
+	return outfile
 
 
 
@@ -101,6 +119,7 @@ if __name__=="__main__":
 	parser = argparse.ArgumentParser()
 
 	parser.add_argument('inputfile', help='CSV file used as import data')
+	parser.add_argument('outputfile', nargs='?', default='', help='Filename to be used for .htaccess output')
 
 	args = parser.parse_args()
 	main(args)
