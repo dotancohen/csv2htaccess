@@ -3,13 +3,12 @@
 import argparse
 import sys
 import urllib.parse
+from pprint import pprint
 
 
 def main(args):
 
-	encoding = 'utf8' # TODO: Option
-
-	lines = getCsvLines(args.inputfile, encoding)
+	lines = getCsvLines(args.inputfile, args.encoding)
 
 	outfile = False
 
@@ -17,7 +16,7 @@ def main(args):
 
 		if not outfile:
 			# Run the iterator before creating the output file
-			outfile = getOutputFile(args.outputfile, args.inputfile, encoding)
+			outfile = getOutputFile(args.outputfile, args.inputfile, args.encoding)
 
 		l = urllib.parse.unquote(l).strip()
 		parts = l.split(",")
@@ -34,7 +33,7 @@ def main(args):
 
 
 
-def getCsvLines(filename, encoding):
+def getCsvLines(filename:str, encoding:str):
 
 	try:
 		with open(filename, mode='r', encoding=encoding) as lines:
@@ -122,6 +121,7 @@ if __name__=="__main__":
 
 	parser.add_argument('inputfile', help='CSV file used as import data')
 	parser.add_argument('outputfile', nargs='?', default='', help='Filename to be used for .htaccess output')
+	parser.add_argument('-e', '--encoding', default='utf-8', help='Character encoding to use for both input and output files.')
 
 	args = parser.parse_args()
 	main(args)
