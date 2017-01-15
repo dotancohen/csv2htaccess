@@ -46,7 +46,7 @@ def getCsvLines(filename:str, encoding:str):
 
 
 
-def getOutputFile(filename, filename_in, encoding):
+def getOutputFile(filename:str, filename_in:str, encoding:str):
 
 	if filename=='':
 		filename_out = filename_in + '.htaccess'
@@ -60,7 +60,7 @@ def getOutputFile(filename, filename_in, encoding):
 
 
 
-def parseCsvLine(old, new):
+def parseCsvLine(old:str, new:str):
 
 	old_parts = urllib.parse.urlparse(old)
 	path = old_parts.path
@@ -82,7 +82,7 @@ parseCsvLine.previousQS = False
 
 
 
-def parseQueryString(path, qs, new):
+def parseQueryString(path:str, qs:list, new:str):
 
 	""""
 	RewriteCond %{REQUEST_URI}  ^/$
@@ -104,7 +104,7 @@ RewriteRule ^(.*)$ %s [R=302,L,NC]"""
 
 
 
-def parsePath(old, new):
+def parsePath(old:str, new:str):
 
 	""""
 	Redirect 301 /foo/bar.html https://example.com/baz.html
