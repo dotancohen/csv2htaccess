@@ -6,7 +6,7 @@ import urllib.parse
 from pprint import pprint
 
 
-def main(args):
+def main(args:argparse.Namespace):
 
 	lines = getCsvLines(args.inputfile, args.encoding)
 
