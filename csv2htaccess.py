@@ -10,6 +10,7 @@ def main(args:argparse.Namespace):
 
 	lines = getCsvLines(args.inputfile, args.encoding)
 
+	code = int(args.redirectcode)
 	outfile = False
 
 	for l in lines:
@@ -24,7 +25,7 @@ def main(args:argparse.Namespace):
 		if len(parts)!=2 or parts[1].strip()=='':
 			continue
 
-		outline = parseCsvLine(parts[0].strip(), parts[1].strip())
+		outline = parseCsvLine(code, parts[0].strip(), parts[1].strip())
 		outfile.write(outline + "\n")
 
 
@@ -60,7 +61,7 @@ def getOutputFile(filename:str, filename_in:str, encoding:str):
 
 
 
-def parseCsvLine(old:str, new:str):
+def parseCsvLine(code:int, old:str, new:str):
 
 	old_parts = urllib.parse.urlparse(old)
 	path = old_parts.path
@@ -73,16 +74,16 @@ def parseCsvLine(old:str, new:str):
 
 	if len(qs)==0:
 		parseCsvLine.previousQS = False
-		return prevNewLine + parsePath(old, new)
+		return prevNewLine + parsePath(code, old, new)
 
 	parseCsvLine.previousQS = True
-	return parseQueryString(path, qs, new)
+	return parseQueryString(code, path, qs, new)
 
 parseCsvLine.previousQS = False
 
 
 
-def parseQueryString(path:str, qs:list, new:str):
+def parseQueryString(code:int, path:str, qs:list, new:str):
 
 	""""
 	RewriteCond %{REQUEST_URI}  ^/$
@@ -92,7 +93,7 @@ def parseQueryString(path:str, qs:list, new:str):
 
 	template = """
 RewriteCond %%{REQUEST_URI}  ^%s$%s
-RewriteRule ^(.*)$ %s [R=302,L,NC]"""
+RewriteRule ^(.*)$ %s [R=%d,L,NC]"""
 
 	qs_cond_template = "\nRewriteCond %%{QUERY_STRING} %s=%s"
 	qs_conditions = ""
@@ -100,19 +101,19 @@ RewriteRule ^(.*)$ %s [R=302,L,NC]"""
 	for q in qs:
 		qs_conditions+= qs_cond_template % (q[0], q[1])
 
-	return template % (path, qs_conditions, new)
+	return template % (path, qs_conditions, new, code)
 
 
 
-def parsePath(old:str, new:str):
+def parsePath(code:int, old:str, new:str):
 
 	""""
 	Redirect 301 /foo/bar.html https://example.com/baz.html
 	"""
 
-	template = "Redirect 301 %s %s"
+	template = "Redirect %d %s %s"
 
-	return template % (old, new)
+	return template % (code, old, new)
 
 
 
@@ -120,8 +121,9 @@ if __name__=="__main__":
 	parser = argparse.ArgumentParser()
 
 	parser.add_argument('inputfile', help='CSV file used as import data')
-	parser.add_argument('outputfile', nargs='?', default='', help='Filename to be used for .htaccess output')
-	parser.add_argument('-e', '--encoding', default='utf-8', help='Character encoding to use for both input and output files.')
+	parser.add_argument('outputfile', nargs='?', default='', help='Filename to be used for .htaccess output.')
+	parser.add_argument('-e', '--encoding', default='utf-8', help='Character encoding to use for input and output files.')
+	parser.add_argument('-r', '--redirectcode', default='302', help='HTTP Status Code to use for redirects.')
 
 	args = parser.parse_args()
 	main(args)
