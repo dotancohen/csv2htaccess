@@ -24,7 +24,10 @@ def main(args:argparse.Namespace):
 		if len(parts)!=2 or parts[1].strip()=='':
 			continue
 
-		outline = parseCsvLine(code, args.urlencode, parts[0].strip(), parts[1].strip())
+		old = parts[0].strip()
+		new = parts[1].strip()
+
+		outline = parseCsvLine(code, args.urlencode, old, new)
 		outfile.write(outline + "\n")
 
 
@@ -84,17 +87,11 @@ parseCsvLine.previousQS = False
 
 def parseQueryString(code:int, urlencode:bool, path:str, qs:list, new:str):
 
-	""""
-	RewriteCond %{REQUEST_URI}  ^/$
-	RewriteCond %{QUERY_STRING} foo=bar
-	RewriteRule ^(.*)$ http://example.com/baz.html [R=302,L,NC]
-	"""
-
 	template = """
-RewriteCond %%{REQUEST_URI}  ^%s$%s
-RewriteRule ^(.*)$ %s [R=%d,L,NC]"""
+RewriteCond %%{REQUEST_URI}  ^%s$ [NC]%s
+RewriteRule ^(.*)$ "%s" [R=%d,L]"""
 
-	qs_cond_template = "\nRewriteCond %%{QUERY_STRING} %s=%s"
+	qs_cond_template = "\nRewriteCond %%{QUERY_STRING} %s=%s [NC]"
 	qs_conditions = ""
 
 	for q in qs:
@@ -114,10 +111,6 @@ RewriteRule ^(.*)$ %s [R=%d,L,NC]"""
 
 
 def parsePath(code:int, urlencode:bool, old:str, new:str):
-
-	""""
-	Redirect 301 /foo/bar.html https://example.com/baz.html
-	"""
 
 	template = "Redirect %d %s %s"
 
