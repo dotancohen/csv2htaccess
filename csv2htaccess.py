@@ -9,7 +9,6 @@ from pprint import pprint
 def main(args:argparse.Namespace):
 
 	lines = getCsvLines(args.inputfile, args.encoding)
-
 	code = int(args.redirectcode)
 	outfile = False
 
@@ -25,7 +24,7 @@ def main(args:argparse.Namespace):
 		if len(parts)!=2 or parts[1].strip()=='':
 			continue
 
-		outline = parseCsvLine(code, parts[0].strip(), parts[1].strip())
+		outline = parseCsvLine(code, args.urlencode, parts[0].strip(), parts[1].strip())
 		outfile.write(outline + "\n")
 
 
@@ -61,7 +60,7 @@ def getOutputFile(filename:str, filename_in:str, encoding:str):
 
 
 
-def parseCsvLine(code:int, old:str, new:str):
+def parseCsvLine(code:int, urlencode:bool, old:str, new:str):
 
 	old_parts = urllib.parse.urlparse(old)
 	path = old_parts.path
@@ -74,16 +73,16 @@ def parseCsvLine(code:int, old:str, new:str):
 
 	if len(qs)==0:
 		parseCsvLine.previousQS = False
-		return prevNewLine + parsePath(code, old, new)
+		return prevNewLine + parsePath(code, urlencode, old, new)
 
 	parseCsvLine.previousQS = True
-	return parseQueryString(code, path, qs, new)
+	return parseQueryString(code, urlencode, path, qs, new)
 
 parseCsvLine.previousQS = False
 
 
 
-def parseQueryString(code:int, path:str, qs:list, new:str):
+def parseQueryString(code:int, urlencode:bool, path:str, qs:list, new:str):
 
 	""""
 	RewriteCond %{REQUEST_URI}  ^/$
@@ -99,19 +98,32 @@ RewriteRule ^(.*)$ %s [R=%d,L,NC]"""
 	qs_conditions = ""
 
 	for q in qs:
-		qs_conditions+= qs_cond_template % (q[0], q[1])
+		k = q[0]
+		v = q[1]
+		if urlencode:
+			k = urllib.parse.quote(k)
+			v = urllib.parse.quote(v)
+		qs_conditions+= qs_cond_template % (k, v)
+
+	if urlencode:
+		path = urllib.parse.quote(path)
+		new = urllib.parse.quote(new)
 
 	return template % (path, qs_conditions, new, code)
 
 
 
-def parsePath(code:int, old:str, new:str):
+def parsePath(code:int, urlencode:bool, old:str, new:str):
 
 	""""
 	Redirect 301 /foo/bar.html https://example.com/baz.html
 	"""
 
 	template = "Redirect %d %s %s"
+
+	if urlencode:
+		old = urllib.parse.quote(old)
+		new = urllib.parse.quote(new)
 
 	return template % (code, old, new)
 
@@ -124,6 +136,7 @@ if __name__=="__main__":
 	parser.add_argument('outputfile', nargs='?', default='', help='Filename to be used for .htaccess output.')
 	parser.add_argument('-e', '--encoding', default='utf-8', help='Character encoding to use for input and output files.')
 	parser.add_argument('-r', '--redirectcode', default='302', help='HTTP Status Code to use for redirects.')
+	parser.add_argument('-u', '--urlencode', action='store_true', help='URL-encode output URLs.')
 
 	args = parser.parse_args()
 	main(args)
