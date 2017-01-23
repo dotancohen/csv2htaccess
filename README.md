@@ -41,3 +41,22 @@ Into this:
 	RewriteCond %{QUERY_STRING} Dog=50
 	RewriteRule ^(.*)$ https://foobar.net/product/mobile [R=302,L,NC]
 
+
+
+# Usage and Arguments
+
+	usage: csv2htaccess.py [-h] [-e ENCODING] [-r REDIRECTCODE] [-u]
+						   inputfile [outputfile]
+
+	positional arguments:
+	  inputfile             CSV file used as import data
+	  outputfile            Filename to be used for .htaccess output.
+
+	optional arguments:
+	  -h, --help            show this help message and exit
+	  -e ENCODING, --encoding ENCODING
+							Character encoding to use for input and output files.
+	  -r REDIRECTCODE, --redirectcode REDIRECTCODE
+							HTTP Status Code to use for redirects.
+	  -u, --urlencode       URL-encode output URLs.
+
